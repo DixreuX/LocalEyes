@@ -1,0 +1,9 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/localeyes.css",
+    "inputFile": "wwwroot/less/localeyes.less",
+    "minify": {
+      "enabled": true
+    }
+  }
+]

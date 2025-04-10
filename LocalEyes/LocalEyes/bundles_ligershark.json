@@ -1,0 +1,26 @@
+{
+  "bundles": [
+    {
+      "bundleName": "connectit.min",
+      "inputFiles": [
+        "wwwroot/lib/bootstrap/css/bootstrap.css",
+      ],
+      "outputFile": "wwwroot/ConnectIT/css/connectit.min.css"
+    },
+    {
+      "bundleName": "connectit.min",
+      "inputFiles": [
+        "wwwroot/lib/jquery/dist/jquery.min.js",
+      ],
+      "outputFile": "wwwroot/ConnectIT/js/connectit.min.js"
+    }
+  ],
+  "areasExcludedFromBundling": [
+    "Admin",
+    "Config",
+    "Identity"
+  ],
+  "areaFilesExcludedFromBundling": [
+
+  ]
+}
