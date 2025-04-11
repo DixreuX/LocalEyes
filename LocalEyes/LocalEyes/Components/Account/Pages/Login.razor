@@ -10,6 +10,12 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
+@attribute [AllowAnonymous]
+
+@code {
+    public string? Layout => null;
+}
+
 <PageTitle>Log in</PageTitle>
 
 <h1>Log in</h1>

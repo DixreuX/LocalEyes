@@ -9,15 +9,13 @@ namespace LocalEyes.Data
             var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-            string stop = "";
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
             await CreateRolesAsync(roleManager);
             await CreateAdminUserAsync(userManager);
         }
 
-        private static async Task CreateRolesAsync(RoleManager<IdentityRole> roleManager)
+        private static async Task CreateRolesAsync(RoleManager<ApplicationRole> roleManager)
         {
             string[] roleNames = { "Administrator", "User" };
 
@@ -27,7 +25,7 @@ namespace LocalEyes.Data
 
                 if (!roleExist)
                 {
-                    var role = new IdentityRole(roleName);
+                    var role = new ApplicationRole { Name = roleName };
 
                     await roleManager.CreateAsync(role);
                 }

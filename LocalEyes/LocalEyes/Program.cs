@@ -20,6 +20,7 @@ namespace LocalEyes
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();
             builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+            builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -27,7 +28,7 @@ namespace LocalEyes
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
             })
