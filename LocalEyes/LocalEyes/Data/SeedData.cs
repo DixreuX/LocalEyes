@@ -13,11 +13,13 @@ namespace LocalEyes.Data
 
             await CreateRolesAsync(roleManager);
             await CreateAdminUserAsync(userManager);
+            await CreateAPIUserAsync(userManager);
+            await CreateUserAsync(userManager);
         }
 
         private static async Task CreateRolesAsync(RoleManager<ApplicationRole> roleManager)
         {
-            string[] roleNames = { "Administrator", "User" };
+            string[] roleNames = { "Administrator", "User", "API User" };
 
             foreach (var roleName in roleNames)
             {
@@ -51,6 +53,52 @@ namespace LocalEyes.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(newUser, "Administrator");
+                }
+            }
+        }
+
+        private static async Task CreateUserAsync(UserManager<ApplicationUser> userManager)
+        {
+            var userEmail = "user@dannyf.com";
+
+            var user = await userManager.FindByEmailAsync(userEmail);
+
+            if (user == null)
+            {
+                var newUser = new ApplicationUser
+                {
+                    UserName = userEmail,
+                    Email = userEmail
+                };
+
+                var result = await userManager.CreateAsync(newUser, "Velk0mmen!");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(newUser, "User");
+                }
+            }
+        }
+
+        private static async Task CreateAPIUserAsync(UserManager<ApplicationUser> userManager)
+        {
+            var userEmail = "apiuser@dannyf.com";
+
+            var user = await userManager.FindByEmailAsync(userEmail);
+
+            if (user == null)
+            {
+                var newUser = new ApplicationUser
+                {
+                    UserName = userEmail,
+                    Email = userEmail
+                };
+
+                var result = await userManager.CreateAsync(newUser, "Velk0mmen!");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(newUser, "API User");
                 }
             }
         }
