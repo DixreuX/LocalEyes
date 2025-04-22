@@ -26,7 +26,7 @@
 
     <button type="button" class="btn btn-primary" @onclick="ManageAccount" >Manage profile</button>
 
-    <button type="button" class="btn btn-danger" @onclick="Logout">Logout</button>
+    <button type="button" class="btn btn-danger" @onclick="RedirectToLogout">Logout</button>
    
 
 </div>
@@ -43,7 +43,7 @@
         userName = user.Identity?.Name;
     }
 
-    private async Task Logout()
+    private async Task RedirectToLogout()
     {
         if (isLoggingOut) return;
 
@@ -51,9 +51,7 @@
 
         try
         {
-            await SignInManager.SignOutAsync();
-
-            //NavigationManager.NavigateTo("/Account/Login");
+            NavigationManager.NavigateTo("/Account/Logout");
         }
         catch (Exception ex)
         {

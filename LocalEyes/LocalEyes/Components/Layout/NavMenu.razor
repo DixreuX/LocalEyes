@@ -1,45 +1,60 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.AspNetCore.Components.Authorization
 
-    <div class="container-fluid">
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
-        <img src="media/LocalEyesLogo.png" alt="Logo" class="navbar-logo me-2" />
+<AuthorizeView>
 
-        <a class="navbar-brand" href="">LocalEyes</a>
+     <Authorized>
 
-    </div>
-</div>
+        <div class="top-row ps-3 navbar navbar-dark">
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+            <div class="container-fluid">
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+                <img src="media/LocalEyesLogo.png" alt="Logo" class="navbar-logo me-2" />
 
-    <nav class="flex-column">
+                <a class="navbar-brand" href="">LocalEyes</a>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-               @*  <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Start *@
-                <i class="fas fa-home" aria-hidden="true"></i> Start
-            </NavLink>
+            </div>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="reports">
-                @* <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Reports *@
-                <i class="fas fa-file-alt" aria-hidden="true"></i> Reports
-            </NavLink>
+        <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+        <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+
+            <nav class="flex-column">
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <i class="fas fa-home" aria-hidden="true"></i> Start
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="reports">
+                        <i class="fas fa-file-alt" aria-hidden="true"></i> Reports
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="municipalities">
+                        <i class="fas fa-tree-city" aria-hidden="true"></i> Municipalities
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="users">
+                        <i class="fas fa-users" aria-hidden="true"></i> Users
+                    </NavLink>
+                </div>
+
+            </nav>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
+    </Authorized>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
+    <NotAuthorized>
+
+    </NotAuthorized>
+
+</AuthorizeView>
 

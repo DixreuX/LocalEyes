@@ -1,6 +1,7 @@
 using LocalEyes.Components;
 using LocalEyes.Components.Account;
 using LocalEyes.Data;
+using LocalEyes.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,13 @@ namespace LocalEyes
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
             builder.Services.AddRazorComponents().AddInteractiveServerComponents();
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddHttpClient<ReportService>();
 
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();
@@ -23,7 +27,6 @@ namespace LocalEyes
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
             builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
@@ -85,6 +88,13 @@ namespace LocalEyes
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.MapGet("/Account/LogoutHandler", async (HttpContext context, SignInManager<ApplicationUser> signInManager) =>
+            {
+                await signInManager.SignOutAsync();
+
+                context.Response.Redirect("/");
+            });
 
             app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 

@@ -1,10 +1,64 @@
 ﻿@page "/reports"
-@rendermode InteractiveServer
+@inject LocalEyes.Services.ReportService ReportService
 
 <PageTitle>Reports</PageTitle>
 
 <h1>Reports</h1>
 
+@if (reports == null)
+{
+    <p>Loading...</p>
+}
+else if (reports.Count == 0)
+{
+    <p>No reports available.</p>
+}
+else
+{
+    <ul>
+        @foreach (var report in reports)
+        {
+            <li>@report.Comment (@report.CreatedDate.ToShortDateString())</li>
+        }
+    </ul>
+}
+
 @code {
-    
+
+    private List<Report> reports;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            reports = await ReportService.GetReportsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching reports: {ex.Message}");
+        }
+    }
+
+    public class Report
+    {
+        public Guid Id { get; set; }
+
+        public Guid TypeId { get; set; }
+
+        public int Priority { get; set; }
+
+        public string Latitude { get; set; } = null!;
+
+        public string Longtitude { get; set; } = null!;
+
+        public string Comment { get; set; } = null!;
+
+        public DateTime CreatedDate { get; set; }
+
+        public DateTime ModifiedDate { get; set; }
+
+        public string ModifedBy { get; set; } = null!;
+
+        public virtual Type Type { get; set; } = null!;
+    }
 }

@@ -1,0 +1,55 @@
+﻿@page "/Account/Logout"
+@layout NoLayout
+@rendermode InteractiveServer
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Identity
+@using LocalEyes.Data
+@using LocalEyes.Components.Layout
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ILogger<Login> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>Log out</PageTitle>
+
+
+<div class="logout-container">
+
+    <img class="logout-image" src="/media/LocalEyesLogo.png" />
+
+    <h3>Log out</h3>
+
+    <div class="row">
+
+        <p>
+                Are you sure that you wish to log out?
+        </p>
+
+            <div class="logout-buttons">
+
+                <button type="submit" class="btn btn-primary logout-btn" @onclick="LogoutUser">Log out</button>
+
+                <button type="submit" class="btn btn-primary" @onclick="ReturnToMainPage">Return</button>
+
+            </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    private void LogoutUser()
+    {
+        NavigationManager.NavigateTo("/Account/LogoutHandler", forceLoad: true);
+    }
+
+    private void ReturnToMainPage()
+    {
+
+        NavigationManager.NavigateTo("/");
+    }
+}
