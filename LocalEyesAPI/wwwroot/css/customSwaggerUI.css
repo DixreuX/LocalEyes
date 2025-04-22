@@ -1,0 +1,30 @@
+﻿.swagger-ui {
+  background-color: #9e9e9e !important;
+}
+.swagger-ui .topbar {
+  background-color: #000000 !important;
+}
+.swagger-ui .scheme-container {
+  background: #9e9e9e !important;
+}
+.title {
+  color: #ffffff !important;
+}
+.btn.authorize {
+  background-color: #ffffff !important;
+}
+.btn.authorize.unlocked {
+  color: #cf3030;
+}
+.btn.authorize.unlocked svg {
+  fill: #cf3030;
+}
+.btn.authorize.locked {
+  color: #49cc90;
+}
+.btn.authorize.locked svg {
+  fill: #49cc90;
+}
+.opblock-summary span {
+  color: #ffffff;
+}

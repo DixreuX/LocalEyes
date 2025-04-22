@@ -1,6 +1,7 @@
 
 using LocalEyesAPI.Data;
 using LocalEyesAPI.Filters;
+using LocalEyesAPI.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +26,10 @@ namespace LocalEyesAPI
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "LocalEyesAPI", Version = "v1" });
+
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
 
                 c.AddSecurityDefinition("APIKey", new OpenApiSecurityScheme
                 {
@@ -75,6 +80,7 @@ namespace LocalEyesAPI
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
             builder.Services.AddScoped<JwtAuthFilter>();
             builder.Services.AddScoped<BasicAuthFilter>();
+            builder.Services.AddSingleton<EncryptionHelper>();
 
             builder.Services.AddDbContext<LocalEyesDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -122,6 +128,8 @@ namespace LocalEyesAPI
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "LocalEyes");
                     c.RoutePrefix = "swagger";
                     c.CacheLifetime = TimeSpan.Zero;
+
+                    c.InjectStylesheet("/css/customSwaggerUI.css");
                 });
             }
 
@@ -129,6 +137,7 @@ namespace LocalEyesAPI
 
             app.UseAuthorization();
 
+            app.UseStaticFiles();
 
             app.MapControllers();
 

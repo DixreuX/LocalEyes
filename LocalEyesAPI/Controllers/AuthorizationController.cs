@@ -20,7 +20,9 @@ namespace LocalEyesAPI.Controllers
             _configuration = configuration;
         }
 
-
+        /// <summary>
+        /// If the credentials are valid, generate JWT token
+        /// </summary>
         [HttpPost("Authenticate")]
         [AllowAnonymous]
         public async Task<IActionResult> Authenticate([FromBody] LoginModel model)

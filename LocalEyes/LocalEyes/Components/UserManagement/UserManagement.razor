@@ -1,0 +1,74 @@
+﻿@page "/user-management"
+@rendermode InteractiveServer
+
+@using LocalEyes.Data
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.Diagnostics
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+<div class="user-management">
+        
+
+    @if (!string.IsNullOrEmpty(userName))
+    {
+        <p>Welcome, @userName!</p>
+    }
+    else
+    {
+        <p>Not logged in.</p>
+    }
+
+
+    <button type="button" class="btn btn-primary" @onclick="ManageAccount" >Manage profile</button>
+
+    <button type="button" class="btn btn-danger" @onclick="Logout">Logout</button>
+   
+
+</div>
+
+@code {
+
+    private string userName = "";
+    private bool isLoggingOut = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userName = user.Identity?.Name;
+    }
+
+    private async Task Logout()
+    {
+        if (isLoggingOut) return;
+
+        isLoggingOut = true;
+
+        try
+        {
+            await SignInManager.SignOutAsync();
+
+            //NavigationManager.NavigateTo("/Account/Login");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Logout failed: {ex.Message}");
+
+            throw;
+        }
+        finally
+        {
+            isLoggingOut = false;
+        }
+    }
+
+    private void ManageAccount()
+    {
+        NavigationManager.NavigateTo("/Account/Manage");
+    }   
+}

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LocalEyesAPI.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Text;
 
@@ -6,88 +7,36 @@ namespace LocalEyesAPI.Filters
 {
     public class BasicAuthFilter : IAuthorizationFilter
     {
-        //      /*
-        // * !!! IMPORTANT: Use this filter for READ-ONLY controllers !!!
-        //*/
 
-        //      private readonly IWebHostEnvironment _env;
+        private readonly EncryptionHelper _securityHelper;
 
-        //      AppInfoHelper _appInfoHelper;
-
-        //      public Root Config { get; private set; }
-        //      public string ClientAuthCredentials { get; private set; }
-
-
-        //      public ApiBasicAuthFilter(IWebHostEnvironment env)
-        //      {
-        //          _env = env;
-
-        //          _appInfoHelper = new AppInfoHelper();
-        //      }
+        public BasicAuthFilter(EncryptionHelper securityHelper)
+        {
+            _securityHelper = securityHelper;
+        }
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
 
-            //Config = _appInfoHelper.GetConfig();
-            //ClientAuthCredentials = Config.Config.Customer.ApiBasicAuthKey;
+            // Check if the APIKey header is present
+            if (!context.HttpContext.Request.Headers.TryGetValue("APIKey", out var providedKey))
+            {
+                context.Result = new UnauthorizedObjectResult("APIKey is missing");
 
-            //try
-            //{
+                return;
+            }
 
-            //    //Montes:oTvv2Zk56#jHH_actWW] = "Basic TW9udGVzOm9UdnYyWms1NiNqSEhfYWN0V1dd"
-            //    if (!context.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader))
-            //    {
-            //        context.Result = new UnauthorizedObjectResult("Authorization is missing");
-            //        return;
-            //    }
+            // Encrypt the provided key and compare it with the stored key
+            var encryptedKey = _securityHelper.EncryptKey();
 
-            //    string authenticationHeader = authHeader;
+            if (encryptedKey != providedKey)
+            {
+                context.Result = new UnauthorizedObjectResult("Invalid APIKey");
 
-            //    if (authenticationHeader.StartsWith("Basic "))
-            //    {
+                return;
+            }
 
-            //        try
-            //        {
-
-            //            var encodedUsernamePassword = authenticationHeader.Substring("Basic ".Length).Trim();
-            //            var decodedUsernamePassword = Encoding.UTF8.GetString(Convert.FromBase64String(encodedUsernamePassword));
-
-            //            if (decodedUsernamePassword != ClientAuthCredentials)
-            //            {
-            //                context.Result = new UnauthorizedObjectResult("Invalid authorization header");
-            //                return;
-            //            }
-
-            //        }
-            //        catch
-            //        {
-            //            context.Result = new UnauthorizedObjectResult("Authorization validation error");
-            //            return;
-            //        }
-            //    }
-
-            //}
-            //catch (Exception)
-            //{
-
-            //    throw;
-            //}
-            //finally
-            //{
-
-            //}
-
-            //app.Use(async (context, next) =>
-            //{
-            //    if (!context.Request.Headers.TryGetValue("APIKey", out var extractedApiKey) || extractedApiKey != builder.Configuration["APIKey"])
-            //    {
-            //        context.Response.StatusCode = 401; // Unauthorized
-            //        await context.Response.WriteAsync("Invalid API Key");
-            //        return;
-            //    }
-
-            //    await next();
-            //});
+            // If the keys match, the request is authorized
 
         }
     }

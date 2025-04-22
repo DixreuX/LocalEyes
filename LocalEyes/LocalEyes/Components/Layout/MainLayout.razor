@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using LocalEyes.Components.UserManagement
+@inherits LayoutComponentBase
 
 <div class="page">
     <div class="sidebar">
@@ -8,7 +9,7 @@
     <main>
         <div class="top-row px-4">
 
-            <LocalEyes.Components.ViewComponents.UserManagement/>
+            <UserManagement/>
         </div>
 
         <article class="content px-4">
@@ -23,5 +24,7 @@
     <a class="dismiss">🗙</a>
 </div>
 
-
+<link rel="stylesheet" href="css/all.min.css" />
 <link rel="stylesheet" href="/css/localeyes.css" asp-append-version="true" />
+
+<script src="/js/jquery-3.7.1.min.js"></script>

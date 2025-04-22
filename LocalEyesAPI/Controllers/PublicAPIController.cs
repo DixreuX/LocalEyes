@@ -7,22 +7,22 @@ namespace LocalEyesAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ReportController : Controller
+    public class PublicAPIController : Controller
     {
 
         private readonly LocalEyesDbContext _context;
 
-        public ReportController(LocalEyesDbContext context)
+        public PublicAPIController(LocalEyesDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Get all reports | Basic Auth
+        /// Get all reports | JWT Auth
         /// </summary>
-        [HttpGet("Reports")]
-        [ServiceFilter<BasicAuthFilter>]
-        public async Task<IActionResult> Reports()
+        [HttpGet("ReportsExternal")]
+        [ServiceFilter<JwtAuthFilter>]
+        public async Task<IActionResult> ReportsExternal()
         {
             var reports = await _context.Reports.ToListAsync();
 

@@ -13,14 +13,15 @@ namespace LocalEyes
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddRazorComponents()
-                .AddInteractiveServerComponents();
-
+            builder.Services.AddRazorComponents().AddInteractiveServerComponents();
             builder.Services.AddCascadingAuthenticationState();
+            builder.Services.AddHttpContextAccessor();
+
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();
             builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
+            builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -35,8 +36,26 @@ namespace LocalEyes
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.SlidingExpiration = true;
+
+                options.Events.OnRedirectToLogout = context =>
+                {
+                    context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+                    context.Response.Headers["Pragma"] = "no-cache";
+                    context.Response.Headers["Expires"] = "0";
+                    context.Response.Redirect(context.RedirectUri);
+
+                    return Task.CompletedTask;
+                };
+            });
+
             builder.Services.AddRazorPages();
-            builder.Services.AddServerSideBlazor();
+
+            builder.Services.AddServerSideBlazor().AddCircuitOptions(options => options.DetailedErrors = true);
 
             var app = builder.Build();
 
@@ -67,8 +86,7 @@ namespace LocalEyes
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode();
+            app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
             app.MapAdditionalIdentityEndpoints();
 

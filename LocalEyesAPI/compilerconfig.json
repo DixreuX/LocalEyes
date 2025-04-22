@@ -1,0 +1,9 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/customSwaggerUI.css",
+    "inputFile": "wwwroot/less/customSwaggerUI.less",
+    "minify": {
+      "enabled": false
+    }
+  }
+]

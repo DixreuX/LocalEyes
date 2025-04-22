@@ -173,11 +173,8 @@ main {
 /* UserManagement */
 .user-management {
   display: flex;
-  /* Use Flexbox to lay out the children in a row */
   justify-content: flex-end;
-  /* Space the items out evenly across the row */
   align-items: center;
-  /* Vertically center the items */
   width: 100%;
   gap: 10px;
 }
@@ -197,4 +194,9 @@ main {
   background-color: #ffffff;
   color: #000000;
   border-color: #ffffff;
+}
+/* Navbar */
+.navbar-logo {
+  height: 40px;
+  width: auto;
 }
