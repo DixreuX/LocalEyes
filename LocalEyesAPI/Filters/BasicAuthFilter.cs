@@ -1,6 +1,7 @@
-﻿using LocalEyesAPI.Helpers;
+﻿using LocalEyes.Shared.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
 using System.Text;
 
 namespace LocalEyesAPI.Filters
@@ -8,11 +9,19 @@ namespace LocalEyesAPI.Filters
     public class BasicAuthFilter : IAuthorizationFilter
     {
 
-        private readonly EncryptionHelper _securityHelper;
+        private readonly EncryptionHelper _encryptionHelper;
+        private readonly IConfiguration _configuration;
 
-        public BasicAuthFilter(EncryptionHelper securityHelper)
+        private string _apiKey = "";
+
+        public BasicAuthFilter(IConfiguration configuration)
         {
-            _securityHelper = securityHelper;
+
+            _configuration = configuration;
+
+            _apiKey = _configuration["BasicAuth:APIKey"];
+
+            _encryptionHelper = new EncryptionHelper(_apiKey);
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)
@@ -27,7 +36,7 @@ namespace LocalEyesAPI.Filters
             }
 
             // Encrypt the provided key and compare it with the stored key
-            var encryptedKey = _securityHelper.EncryptKey();
+            var encryptedKey = _encryptionHelper.EncryptKey();
 
             if (encryptedKey != providedKey)
             {

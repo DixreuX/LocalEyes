@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalEyesAPI", "..\LocalEye
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalEyesUT", "..\LocalEyesUT\LocalEyesUT.csproj", "{B8F95A32-B090-439C-85D7-23B5A58355F5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalEyes.Shared", "..\LocalEyes.Shared\LocalEyes.Shared.csproj", "{A7F723EE-9C3E-4AE8-817A-12ABFE5BD786}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B8F95A32-B090-439C-85D7-23B5A58355F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8F95A32-B090-439C-85D7-23B5A58355F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8F95A32-B090-439C-85D7-23B5A58355F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7F723EE-9C3E-4AE8-817A-12ABFE5BD786}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7F723EE-9C3E-4AE8-817A-12ABFE5BD786}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7F723EE-9C3E-4AE8-817A-12ABFE5BD786}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7F723EE-9C3E-4AE8-817A-12ABFE5BD786}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,6 +5,7 @@ using LocalEyes.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace LocalEyes
 {
@@ -27,6 +28,10 @@ namespace LocalEyes
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
             builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
+            builder.Services.Configure<IdentityOptions>(options =>
+            {
+                options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
+            });
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 

@@ -15,6 +15,15 @@
 @btn-primary-background-color-hover: #4698eb;
 @btn-primary-border-color-hover: #4698eb;
 
+@btn-danger-text-color: #fff;
+@btn-danger-background-color: #de0016;
+@btn-danger-border-color: #de0016;
+
+@btn-danger-text-color-hover: #fff;
+@btn-danger-background-color-hover: #ff263c;
+@btn-danger-border-color-hover: #ff263c;
+
+
 /* Nav menu */
 @menu-item-font-size: 18px;
 
@@ -25,8 +34,6 @@
 @menu-item-background-hover: #000000;
 
 
-
-
 html, body {
     font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
 }
@@ -35,11 +42,33 @@ a, .btn-link {
     color: #006bb7;
 }
 
-/*.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}*/
+.btn-primary {
+    background-color: @btn-primary-background-color !important;
+    color: @btn-primary-text-color !important;
+    border-color: @btn-primary-border-color !important;
+    border: 3px solid;
+
+    &:hover {
+        background-color: @btn-primary-background-color-hover !important;
+        color: @btn-primary-text-color-hover !important;
+        border-color: @btn-primary-border-color-hover !important;
+        border: 3px solid;
+    }
+}
+
+.btn-danger {
+    background-color: @btn-danger-background-color !important;
+    color: @btn-danger-text-color !important;
+    border-color: @btn-danger-border-color !important;
+    border: 3px solid;
+
+    &:hover {
+        background-color: @btn-danger-background-color-hover !important;
+        color: @btn-primary-text-color-hover !important;
+        border-color: @btn-danger-border-color-hover !important;
+        border: 3px solid;
+    }
+}
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
@@ -299,20 +328,6 @@ main {
     align-items: center;
     height: 100vh;
 
-    & .btn-primary {
-        background-color: @btn-primary-background-color !important;
-        color: @btn-primary-text-color !important;
-        border-color: @btn-primary-border-color !important;
-        border: 3px solid;
-
-        &:hover {
-            background-color: @btn-primary-background-color-hover !important;
-            color: @btn-primary-text-color-hover !important;
-            border-color: @btn-primary-border-color-hover !important;
-            border: 3px solid;
-        }
-    }
-
     & .logout-image {
         width: auto;
         height: 150px;
@@ -334,21 +349,6 @@ main {
         gap: 10px;
         width: 100%;
         margin-top: 20px;
-    }
-
-
-    & .logout-btn {
-        background-color: #de0016 !important;
-        color: white !important;
-        border-color: #de0016 !important;
-        border: 3px solid;
-
-        &:hover {
-            background-color: #ff263c !important;
-            color: @btn-primary-text-color-hover !important;
-            border-color: #ff263c !important;
-            border: 3px solid;
-        }
     }
 }
 
@@ -426,4 +426,63 @@ main {
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
     }
+}
+
+/* Maps */
+
+.expanded-row #map {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Tables */
+
+.expanded-row td {
+    padding: 10px;
+    border: 1px solid #ddd; 
+}
+
+.expanded-row {
+    background-color: #f9f9f9;
+    border-top: none;
+}
+
+.actions-column {
+    text-align: right;
+
+    & .map-btn {
+        background-color: #00cc0e !important;
+        color: #fff !important;
+        border-color: #00cc0e !important;
+        border: 3px solid;
+
+        &:hover {
+            background-color: #35f042 !important;
+            color: #fff !important;
+            border-color: #35f042 !important;
+            border: 3px solid;
+        }
+    }
+}
+
+th {
+    font-size: 18px;
+}
+
+td {
+    font-size: 18px;
+    vertical-align: middle;
+}
+
+/* Forms */
+
+label {
+    margin: 0 0 5px 2px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.form-fields {
+    margin: 10px 0 10px 0;
 }

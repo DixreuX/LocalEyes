@@ -1,22 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace LocalEyesAPI.Helpers
+namespace LocalEyes.Shared.Helpers
 {
 
     public class EncryptionHelper
     {
-        private readonly IConfiguration _configuration;
         private string _key;
         private string _salt = "LaesoeSalt";
 
-        public EncryptionHelper(IConfiguration configuration)
+        public EncryptionHelper(string apiKey)
         {
-            _configuration = configuration;
-
-            _key = Encoding.UTF8.GetBytes(_configuration["API:Key"]).ToString();
+            _key = Encoding.UTF8.GetBytes(apiKey).ToString();
         }
 
         public string EncryptKey()
@@ -26,8 +22,6 @@ namespace LocalEyesAPI.Helpers
             using (SHA256 sha256 = SHA256.Create())
             {
                 byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
-
-                //Debug.WriteLine("Hash: " + Convert.ToBase64String(hashBytes));
 
                 return Convert.ToBase64String(hashBytes);
             }

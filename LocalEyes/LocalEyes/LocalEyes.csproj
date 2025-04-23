@@ -4,6 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<AssemblyName>LocalEyes</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -26,6 +27,10 @@
 
 	<ItemGroup>
 		<None Include="compilerconfig.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\LocalEyes.Shared\LocalEyes.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

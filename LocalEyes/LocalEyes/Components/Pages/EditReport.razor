@@ -1,0 +1,215 @@
+﻿@page "/editreport"
+@page "/editreport/{ReportId:guid}"
+
+@rendermode InteractiveServer
+
+@using LocalEyes.Services
+@using LocalEyes.Shared.Models
+@using System.Diagnostics
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject ReportService ReportService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<h3>@(IsNewReport ? "Create report" : "Edit report")</h3>
+
+<br />
+
+<EditForm Model="report" OnValidSubmit="SaveReport">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="col-md-12">
+
+        <div class=" col-md-6">
+
+
+            <div class="form-fields">
+
+                <label>Type</label>
+
+                <InputSelect @bind-Value="report.TypeId" class="form-control">
+
+                    <option value="">Select a type</option>
+
+                    @foreach (var type in types)
+                    {
+                        <option value="@type.Id">@type.Name</option>
+                    }
+
+                </InputSelect>
+
+            </div>
+
+            <div class="form-fields">
+
+                <label>Comment</label>
+                <InputText @bind-Value="report.Comment" class="form-control" />
+
+            </div>
+
+            @if (isAdmin)
+            {
+                <div class="form-fields">
+
+                    <label>Priority</label>
+                    <InputNumber @bind-Value="report.Priority" class="form-control" />
+
+                </div>
+            }
+
+            <p style="margin-top: 20px;">Set a marker on the map to automatically get the coordinates or input them manually</p>
+
+            <div class="form-fields">
+
+                <label>Latitude</label>
+                <InputText @bind-Value="report.Latitude" id="latitudeInput" class="form-control" />
+
+            </div>
+
+            <div class="form-fields">
+
+                <label>Longitude</label>
+                <InputText @bind-Value="report.Longtitude" id="longitudeInput" class="form-control" />
+
+            </div>
+
+            <div id="map" style="height: 340px; width: 100%; margin: 30px 0 10px 0;"></div>
+
+
+        </div>
+
+        <div class=" col-md-6">
+        </div>
+
+    </div>
+
+    
+    <button type="submit" class="btn btn-primary mt-3 mb-5">Save</button>
+
+</EditForm>
+
+<script>
+
+    function initializeEditableMap(mapId, latitude, longitude) {
+
+    const defaultLatitude = 57.0488;
+    const defaultLongitude = 9.9217;
+
+    const mapLatitude = latitude || defaultLatitude;
+    const mapLongitude = longitude || defaultLongitude;
+
+    const map = L.map(mapId).setView([mapLatitude, mapLongitude], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+    }).addTo(map);
+
+
+    let marker = L.marker([mapLatitude, mapLongitude]).addTo(map);
+
+    map.on('click', function (e) {
+
+    let { lat, lng } = e.latlng;
+
+    lat = lat.toFixed(4);
+    lng = lng.toFixed(4);
+
+    if (marker) 
+    {
+    marker.setLatLng(e.latlng);
+    } 
+    else 
+    {
+    marker = L.marker(e.latlng).addTo(map);
+    }
+
+    document.getElementById('latitudeInput').value = lat;
+    document.getElementById('longitudeInput').value = lng;
+
+    });
+    }
+
+</script>
+
+@code {
+
+    [Parameter]
+    public Guid? ReportId { get; set; }
+
+    private Report report = new();
+    private bool IsNewReport => !ReportId.HasValue;
+    private List<Shared.Models.Type> types = new();
+    private bool isAdmin = false;
+
+    private const double DefaultLatitude = 57.0488; // Aalborg
+    private const double DefaultLongitude = 9.9217; // Aalborg
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        types = await ReportService.GetTypesAsync();
+
+        if (!IsNewReport)
+        {
+            report = await ReportService.GetReportByIdAsync(ReportId.Value);
+        }
+        else
+        {
+            report.Latitude = DefaultLatitude.ToString();
+            report.Longtitude = DefaultLongitude.ToString();
+            report.Priority = 3; // Default value
+        }
+
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+
+        // Log all claims for debugging
+        foreach (var claim in user.Claims)
+        {
+            Debug.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
+        }
+
+        isAdmin = user.IsInRole("Administrator");
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeEditableMap", "map", report.Latitude, report.Longtitude);
+        }
+    }
+
+    private async Task SaveReport()
+    {
+        if (!isAdmin)
+        {
+            report.Priority = 3;
+        }
+
+        if (IsNewReport)
+        {
+            await ReportService.CreateReportAsync(report);
+        }
+        else
+        {
+            await ReportService.UpdateReportAsync(report);
+        }
+
+        Navigation.NavigateTo("/reports");
+    }
+
+    public void UpdateCoordinatesFromJS(string latitude, string longitude)
+    {
+        report.Latitude = latitude;
+        report.Longtitude = longitude;
+
+        StateHasChanged();
+    }
+}

@@ -1,9 +1,43 @@
 ﻿@page "/reports"
+
+@using LocalEyes.Shared.Models
+
 @inject LocalEyes.Services.ReportService ReportService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
 
 <PageTitle>Reports</PageTitle>
 
+<script>
+
+    function initializeLeafletMap(mapId, latitude, longitude) {
+
+    const map = L.map(mapId).setView([parseFloat(latitude), parseFloat(longitude)], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+    }).addTo(map);
+
+    L.marker([parseFloat(latitude), parseFloat(longitude)]).addTo(map);
+    }
+
+</script>
+
 <h1>Reports</h1>
+<br />
+<br />
+
+<row>
+
+    <div class="col-md-12" style="text-align: end">
+        <button class="btn btn-primary" @onclick="() => CreateReport()">New report</button>
+    </div>
+
+    
+
+</row>
 
 @if (reports == null)
 {
@@ -15,17 +49,60 @@ else if (reports.Count == 0)
 }
 else
 {
-    <ul>
-        @foreach (var report in reports)
-        {
-            <li>@report.Comment (@report.CreatedDate.ToShortDateString())</li>
-        }
-    </ul>
+    <table class="table">
+
+        <thead>
+
+            <tr>
+                <th>Comment</th>
+                <th>Type</th>
+                <th>Created Date</th>
+                <th class="actions-column"></th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var report in reports)
+            {
+                <tr>
+                    <td><strong>@report.Comment</strong></td>
+                    <td>@report.Type?.Name</td>
+                    <td>@report.CreatedDate.ToShortDateString()</td>
+                    <td class="actions-column">
+                        <button class="btn btn-primary" @onclick="() => EditReport(report.Id)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteReport(report.Id)">Delete</button>
+                        <button class="btn btn-primary map-btn" @onclick="() => ToggleMap(report.Id)">Map</button>
+                    </td>
+                </tr>
+                @if (expandedRows.ContainsKey(report.Id) && expandedRows[report.Id])
+                {
+                    <tr class="expanded-row">
+
+                        <td colspan="6">
+
+                            <div>
+                                <strong>Latitude:</strong> @report.Latitude
+                                <br />
+                                <strong>Longitude:</strong> @report.Longtitude
+                                <div id="map-@report.Id" style="height: 400px; width: 100%; margin-top: 10px;"></div>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
 }
 
 @code {
 
     private List<Report> reports;
+    private Dictionary<Guid, bool> expandedRows = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,26 +116,58 @@ else
         }
     }
 
-    public class Report
+
+    private async Task ToggleMap(Guid reportId)
     {
-        public Guid Id { get; set; }
+        if (expandedRows.ContainsKey(reportId))
+        {
+            expandedRows[reportId] = !expandedRows[reportId];
+        }
+        else
+        {
+            expandedRows[reportId] = true;
+        }
 
-        public Guid TypeId { get; set; }
+        await Task.Delay(50);
 
-        public int Priority { get; set; }
+        if (expandedRows[reportId])
+        {
+            await InitializeMapAsync(reportId);
+        }
+    }
 
-        public string Latitude { get; set; } = null!;
+    private async Task InitializeMapAsync(Guid reportId)
+    {
+        var report = reports.FirstOrDefault(r => r.Id == reportId);
 
-        public string Longtitude { get; set; } = null!;
+        if (report != null)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeLeafletMap", $"map-{report.Id}", report.Latitude, report.Longtitude);
+        }
+    }
 
-        public string Comment { get; set; } = null!;
+    private void CreateReport()
+    {
+        Navigation.NavigateTo("/editreport");
+    }
 
-        public DateTime CreatedDate { get; set; }
+    private void EditReport(Guid reportId)
+    {
+        Navigation.NavigateTo($"/editreport/{reportId}");
+    }
 
-        public DateTime ModifiedDate { get; set; }
+    private async Task DeleteReport(Guid reportId)
+    {
+        try
+        {
+            //await ReportService.DeleteReportAsync(reportId);
 
-        public string ModifedBy { get; set; } = null!;
-
-        public virtual Type Type { get; set; } = null!;
+            reports = reports.Where(r => r.Id != reportId).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting report: {ex.Message}");
+        }
     }
 }
+
