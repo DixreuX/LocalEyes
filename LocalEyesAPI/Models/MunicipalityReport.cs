@@ -1,4 +1,5 @@
 ﻿using LocalEyesAPI.Models;
+using LocalEyes.Shared.Models;
 using System;
 using System.Collections.Generic;
 

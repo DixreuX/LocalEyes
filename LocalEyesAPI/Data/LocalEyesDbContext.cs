@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LocalEyesAPI.Models;
+using LocalEyes.Shared.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,7 @@ public partial class LocalEyesDbContext : IdentityDbContext<ApplicationUser, App
 
     public DbSet<ReportComment> ReportComments { get; set; }
 
-    public DbSet<LocalEyesAPI.Models.Type> Types { get; set; }
+    public DbSet<LocalEyes.Shared.Models.Type> Types { get; set; }
 
     public DbSet<UserReport> UserReports { get; set; }
 
@@ -50,7 +51,7 @@ public partial class LocalEyesDbContext : IdentityDbContext<ApplicationUser, App
 
         modelBuilder.Entity<ReportComment>().ToTable("ReportComment");
 
-        modelBuilder.Entity<LocalEyesAPI.Models.Type>().ToTable("Type");
+        modelBuilder.Entity<LocalEyes.Shared.Models.Type>().ToTable("Type");
 
         modelBuilder.Entity<UserReport>().ToTable("UserReport");
 

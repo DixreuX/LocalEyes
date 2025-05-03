@@ -1,10 +1,12 @@
 ﻿@page "/reports"
 
 @using LocalEyes.Shared.Models
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject LocalEyes.Services.ReportService ReportService
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @rendermode InteractiveServer
 
@@ -34,8 +36,6 @@
     <div class="col-md-12" style="text-align: end">
         <button class="btn btn-primary" @onclick="() => CreateReport()">New report</button>
     </div>
-
-    
 
 </row>
 
@@ -68,12 +68,25 @@ else
             {
                 <tr>
                     <td><strong>@report.Comment</strong></td>
-                    <td>@report.Type?.Name</td>
+                    <td><strong>@report.Type?.Name</strong></td>
                     <td>@report.CreatedDate.ToShortDateString()</td>
                     <td class="actions-column">
-                        <button class="btn btn-primary" @onclick="() => EditReport(report.Id)">Edit</button>
-                        <button class="btn btn-danger" @onclick="() => DeleteReport(report.Id)">Delete</button>
-                        <button class="btn btn-primary map-btn" @onclick="() => ToggleMap(report.Id)">Map</button>
+
+                        <button class="btn btn-primary table-action-btn ms-1" @onclick="() => ToggleMap(report.Id)">
+                            <i class="fas fa-map-location-dot" aria-hidden="true"></i>
+                        </button>
+
+                        @if (IsAdmin)
+                        {
+                            <button class="btn btn-primary table-action-btn ms-1" @onclick="() => EditReport(report.Id)">
+                                <i class="fas fa-pencil" aria-hidden="true"></i>
+                            </button>
+
+                            <button class="btn btn-danger table-action-btn ms-1" @onclick="() => DeleteReport(report.Id)">
+                                <i class="fas fa-trash" aria-hidden="true"></i>
+                            </button>
+                        }
+
                     </td>
                 </tr>
                 @if (expandedRows.ContainsKey(report.Id) && expandedRows[report.Id])
@@ -85,7 +98,7 @@ else
                             <div>
                                 <strong>Latitude:</strong> @report.Latitude
                                 <br />
-                                <strong>Longitude:</strong> @report.Longtitude
+                                <strong>Longitude:</strong> @report.Longitude
                                 <div id="map-@report.Id" style="height: 400px; width: 100%; margin-top: 10px;"></div>
 
                             </div>
@@ -99,13 +112,36 @@ else
     </table>
 }
 
+@if (showDeleteConfirmation)
+{
+    <div class="modal-overlay">
+        <div class="modal-box">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this report?</p>
+            <div class="modal-actions">
+                <button class="btn btn-danger" @onclick="ConfirmDelete">Confirm</button>
+                <button class="btn btn-primary" @onclick="CancelDelete">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
 
     private List<Report> reports;
     private Dictionary<Guid, bool> expandedRows = new();
+    private bool IsAdmin = false;
+    private bool showDeleteConfirmation = false;
+    private Guid reportToDelete;
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        var user = authState.User;
+
+        IsAdmin = user.Identity?.IsAuthenticated == true && user.IsInRole("Administrator");
+
         try
         {
             reports = await ReportService.GetReportsAsync();
@@ -142,7 +178,7 @@ else
 
         if (report != null)
         {
-            await JSRuntime.InvokeVoidAsync("initializeLeafletMap", $"map-{report.Id}", report.Latitude, report.Longtitude);
+            await JSRuntime.InvokeVoidAsync("initializeLeafletMap", $"map-{report.Id}", report.Latitude, report.Longitude);
         }
     }
 
@@ -156,18 +192,33 @@ else
         Navigation.NavigateTo($"/editreport/{reportId}");
     }
 
-    private async Task DeleteReport(Guid reportId)
+    private void DeleteReport(Guid reportId)
+    {
+        reportToDelete = reportId;
+        showDeleteConfirmation = true;
+    }
+
+    private async Task ConfirmDelete()
     {
         try
         {
-            //await ReportService.DeleteReportAsync(reportId);
+            await ReportService.DeleteReport(reportToDelete);
 
-            reports = reports.Where(r => r.Id != reportId).ToList();
+            reports = reports.Where(r => r.Id != reportToDelete).ToList();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error deleting report: {ex.Message}");
         }
+        finally
+        {
+            showDeleteConfirmation = false;
+        }
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false;
     }
 }
 

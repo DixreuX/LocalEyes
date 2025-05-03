@@ -3,6 +3,7 @@ using LocalEyes.Shared.Helpers;
 using LocalEyes.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using static LocalEyes.Components.Pages.Reports;
@@ -28,13 +29,13 @@ namespace LocalEyes.Services
             _encryptionHelper = new EncryptionHelper(_apiKeyRaw);
             _apiKeyEncrypted = _encryptionHelper.EncryptKey();
 
-            // Set the base address from appsettings.json
             _httpClient.BaseAddress = new Uri(_configuration["API:BaseUrl"]);
+            _httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
         }
 
         public async Task<List<Report>> GetReportsAsync()
         {
-            _httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
+            //_httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
 
             var response = await _httpClient.GetAsync("Report/Reports");
 
@@ -50,7 +51,7 @@ namespace LocalEyes.Services
 
         public async Task<List<Shared.Models.Type>> GetTypesAsync()
         {
-            _httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
+            //_httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
 
             var response = await _httpClient.GetAsync("Report/Types");
 
@@ -64,8 +65,19 @@ namespace LocalEyes.Services
             throw new Exception($"Failed to fetch types: {response.ReasonPhrase}");
         }
 
-        public async Task CreateReportAsync(Report report)
+        public async Task CreateReport(Report report)
         {
+
+            // Serialize the report object to JSON
+            var requestJson = JsonSerializer.Serialize(report, new JsonSerializerOptions
+            {
+                WriteIndented = true // Optional: Makes the JSON more readable
+            });
+
+            // Log or inspect the JSON (for debugging purposes)
+            Debug.WriteLine("Request JSON:");
+            Debug.WriteLine(requestJson);
+
             var response = await _httpClient.PostAsJsonAsync("Report/Create", report);
 
             if (!response.IsSuccessStatusCode)
@@ -74,8 +86,10 @@ namespace LocalEyes.Services
             }
         }
 
-        public async Task UpdateReportAsync(Report report)
+        public async Task UpdateReport(Report report)
         {
+            //_httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
+
             var response = await _httpClient.PutAsJsonAsync($"Report/Update/{report.Id}", report);
 
             if (!response.IsSuccessStatusCode)
@@ -86,6 +100,8 @@ namespace LocalEyes.Services
 
         public async Task<Report> GetReportByIdAsync(Guid reportId)
         {
+            //_httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
+
             var response = await _httpClient.GetAsync($"Report/{reportId}");
 
             if (response.IsSuccessStatusCode)
@@ -98,6 +114,15 @@ namespace LocalEyes.Services
             throw new Exception($"Failed to fetch report: {response.ReasonPhrase}");
         }
 
+        public async Task DeleteReport(Guid reportId)
+        {
+            var response = await _httpClient.DeleteAsync($"Report/Delete/{reportId}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Failed to delete report: {response.ReasonPhrase}");
+            }
+        }
 
     }
 }

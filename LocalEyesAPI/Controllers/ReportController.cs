@@ -1,8 +1,9 @@
 ﻿using LocalEyesAPI.Data;
 using LocalEyesAPI.Filters;
-using LocalEyesAPI.Models;
+using LocalEyes.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace LocalEyesAPI.Controllers
 {
@@ -37,21 +38,28 @@ namespace LocalEyesAPI.Controllers
         public async Task<IActionResult> GetTypes()
         {
             var types = await _context.Types
-        .Select(t => new { t.Id, t.Name }) 
-        .ToListAsync();
+            .Select(t => new { t.Id, t.Name })
+            .ToListAsync();
 
             return Ok(types);
         }
 
         [HttpPost("Create")]
         [ServiceFilter<BasicAuthFilter>]
-        public async Task<IActionResult> CreateReport([FromBody] Report report)
+        public async Task<IActionResult> CreateReportAsync([FromBody] Report report)
         {
-            report.Id = Guid.NewGuid();
-            report.CreatedDate = DateTime.UtcNow;
-            report.ModifiedDate = DateTime.UtcNow;
+            if (report == null)
+            {
+                return BadRequest("Report cannot be null.");
+            }
+
+            if (report.Type == null)
+            {
+                Debug.WriteLine("Type is null. Proceeding without it.");
+            }
 
             _context.Reports.Add(report);
+
             await _context.SaveChangesAsync();
 
             return Ok(report);
@@ -59,7 +67,7 @@ namespace LocalEyesAPI.Controllers
 
         [HttpPut("Update/{id:guid}")]
         [ServiceFilter<BasicAuthFilter>]
-        public async Task<IActionResult> UpdateReport(Guid id, [FromBody] Report report)
+        public async Task<IActionResult> UpdateReportAsync(Guid id, [FromBody] Report report)
         {
             var existingReport = await _context.Reports.FindAsync(id);
 
@@ -70,7 +78,7 @@ namespace LocalEyesAPI.Controllers
 
             existingReport.Comment = report.Comment;
             existingReport.Latitude = report.Latitude;
-            existingReport.Longtitude = report.Longtitude;
+            existingReport.Longitude = report.Longitude;
             existingReport.Priority = report.Priority;
             existingReport.ModifiedDate = DateTime.UtcNow;
 
@@ -91,6 +99,23 @@ namespace LocalEyesAPI.Controllers
             }
 
             return Ok(report);
+        }
+
+        [HttpDelete("Delete/{id:guid}")]
+        [ServiceFilter<BasicAuthFilter>]
+        public async Task<IActionResult> DeleteReportAsync(Guid id)
+        {
+            var report = await _context.Reports.FindAsync(id);
+
+            if (report == null)
+            {
+                return NotFound($"Report with ID {id} not found.");
+            }
+
+            _context.Reports.Remove(report);
+            await _context.SaveChangesAsync();
+
+            return Ok($"Report with ID {id} has been deleted.");
         }
     }
 }

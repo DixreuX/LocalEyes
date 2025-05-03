@@ -7,6 +7,7 @@
 @using LocalEyes.Shared.Models
 @using System.Diagnostics
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Globalization
 
 @inject ReportService ReportService
 @inject NavigationManager Navigation
@@ -23,8 +24,9 @@
 
     <div class="col-md-12">
 
-        <div class=" col-md-6">
+        
 
+        <div class=" col-md-6">
 
             <div class="form-fields">
 
@@ -72,7 +74,7 @@
             <div class="form-fields">
 
                 <label>Longitude</label>
-                <InputText @bind-Value="report.Longtitude" id="longitudeInput" class="form-control" />
+                <InputText @bind-Value="report.Longitude" id="longitudeInput" class="form-control" />
 
             </div>
 
@@ -93,43 +95,48 @@
 
 <script>
 
-    function initializeEditableMap(mapId, latitude, longitude) {
+    function initializeEditableMap(mapId, latitude, longitude, defaultLatitude, defaultLongitude) {
 
-    const defaultLatitude = 57.0488;
-    const defaultLongitude = 9.9217;
+        try {
+            console.log("Initializing map...");
+            console.log("Map ID:", mapId);
+            console.log("Latitude received:", latitude);
+            console.log("Longitude received:", longitude);
 
-    const mapLatitude = latitude || defaultLatitude;
-    const mapLongitude = longitude || defaultLongitude;
+            const mapLatitude = latitude || defaultLatitude;
+            const mapLongitude = longitude || defaultLongitude;
 
-    const map = L.map(mapId).setView([mapLatitude, mapLongitude], 13);
+            console.log("Using Latitude:", mapLatitude);
+            console.log("Using Longitude:", mapLongitude);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-    }).addTo(map);
+            const map = L.map(mapId).setView([mapLatitude, mapLongitude], 13);
 
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(map);
 
-    let marker = L.marker([mapLatitude, mapLongitude]).addTo(map);
+            let marker = L.marker([mapLatitude, mapLongitude]).addTo(map);
 
-    map.on('click', function (e) {
+            map.on('click', function (e) {
+                let { lat, lng } = e.latlng;
 
-    let { lat, lng } = e.latlng;
+                console.log("Marker clicked. New Latitude:", lat, "New Longitude:", lng);
 
-    lat = lat.toFixed(4);
-    lng = lng.toFixed(4);
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng).addTo(map);
+                }
 
-    if (marker) 
-    {
-    marker.setLatLng(e.latlng);
-    } 
-    else 
-    {
-    marker = L.marker(e.latlng).addTo(map);
-    }
+                document.getElementById('latitudeInput').value = lat;
+                document.getElementById('longitudeInput').value = lng;
+            });
 
-    document.getElementById('latitudeInput').value = lat;
-    document.getElementById('longitudeInput').value = lng;
+                console.log("Map initialized successfully.");
 
-    });
+            } catch (error) {
+                console.error("Error initializing map:", error);
+            }
     }
 
 </script>
@@ -144,8 +151,8 @@
     private List<Shared.Models.Type> types = new();
     private bool isAdmin = false;
 
-    private const double DefaultLatitude = 57.0488; // Aalborg
-    private const double DefaultLongitude = 9.9217; // Aalborg
+    private const double DefaultLatitude = 57.04705499214535; // Aalborg
+    private const double DefaultLongitude = 9.92168426513672; // Aalborg
 
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; }
@@ -161,18 +168,17 @@
         else
         {
             report.Latitude = DefaultLatitude.ToString();
-            report.Longtitude = DefaultLongitude.ToString();
+            report.Longitude = DefaultLongitude.ToString();
             report.Priority = 3; // Default value
         }
 
         var authState = await AuthenticationStateTask;
         var user = authState.User;
 
-        // Log all claims for debugging
-        foreach (var claim in user.Claims)
-        {
-            Debug.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-        }
+        // foreach (var claim in user.Claims)
+        // {
+        //     Debug.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
+        // }
 
         isAdmin = user.IsInRole("Administrator");
 
@@ -180,9 +186,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        Debug.WriteLine($"Initializing map with Latitude = {report.Latitude}, Longitude = {report.Longitude}");
+
+        if (firstRender && !string.IsNullOrEmpty(report.Latitude) && !string.IsNullOrEmpty(report.Longitude))
         {
-            await JSRuntime.InvokeVoidAsync("initializeEditableMap", "map", report.Latitude, report.Longtitude);
+            await JSRuntime.InvokeVoidAsync("initializeEditableMap", "map", report.Latitude, report.Longitude, DefaultLatitude, DefaultLongitude);
         }
     }
 
@@ -193,13 +201,22 @@
             report.Priority = 3;
         }
 
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+
+
+        report.Id = Guid.NewGuid();
+        report.CreatedDate = DateTime.UtcNow;
+        report.ModifiedDate = DateTime.UtcNow;
+        report.ModifedBy = user.Identity?.Name ?? "";
+
         if (IsNewReport)
         {
-            await ReportService.CreateReportAsync(report);
+            await ReportService.CreateReport(report);
         }
         else
         {
-            await ReportService.UpdateReportAsync(report);
+            await ReportService.UpdateReport(report);
         }
 
         Navigation.NavigateTo("/reports");
@@ -208,7 +225,7 @@
     public void UpdateCoordinatesFromJS(string latitude, string longitude)
     {
         report.Latitude = latitude;
-        report.Longtitude = longitude;
+        report.Longitude = longitude;
 
         StateHasChanged();
     }

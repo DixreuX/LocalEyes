@@ -13,7 +13,7 @@ public partial class Report
 
     public string Latitude { get; set; } = null!;
 
-    public string Longtitude { get; set; } = null!;
+    public string Longitude { get; set; } = null!;
 
     public string Comment { get; set; } = null!;
 
@@ -23,5 +23,6 @@ public partial class Report
 
     public string ModifedBy { get; set; } = null!;
 
-    public virtual Type Type { get; set; } = null!;
+    public virtual Type? Type { get; set; } = null!;
+
 }

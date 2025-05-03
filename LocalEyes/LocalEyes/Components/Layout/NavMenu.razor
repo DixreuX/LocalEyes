@@ -4,13 +4,13 @@
 
 <AuthorizeView>
 
-     <Authorized>
+    <Authorized>
 
         <div class="top-row ps-3 navbar navbar-dark">
 
             <div class="container-fluid">
 
-                <img src="media/LocalEyesLogo.png" alt="Logo" class="navbar-logo me-2" />
+                <img src="media/LocalEyesLogo-transparent-white.png" alt="Logo" class="navbar-logo" />
 
                 <a class="navbar-brand" href="">LocalEyes</a>
 
@@ -41,14 +41,31 @@
                     </NavLink>
                 </div>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="users">
-                        <i class="fas fa-users" aria-hidden="true"></i> Users
-                    </NavLink>
-                </div>
+                @if (IsAdmin)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="users">
+                            <i class="fas fa-users" aria-hidden="true"></i> Users
+                        </NavLink>
+                    </div>
+                }
 
             </nav>
         </div>
+
+        @code 
+        {
+            private bool IsAdmin = false;
+
+            protected override async Task OnInitializedAsync()
+            {
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+                var user = authState.User;
+
+                IsAdmin = user.Identity?.IsAuthenticated == true && user.IsInRole("Administrator");
+            } 
+        }
 
     </Authorized>
 
