@@ -25,7 +25,7 @@ namespace LocalEyesAPI.Filters
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var token = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var token = context.HttpContext.Request.Headers["jwt"].FirstOrDefault()?.Split(" ").Last();
             var url = context.HttpContext.Request.Path.Value;
 
             if (TokenHandler.CanReadToken(token))

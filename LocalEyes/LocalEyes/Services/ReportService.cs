@@ -67,11 +67,9 @@ namespace LocalEyes.Services
 
         public async Task CreateReport(Report report)
         {
-
-            // Serialize the report object to JSON
             var requestJson = JsonSerializer.Serialize(report, new JsonSerializerOptions
             {
-                WriteIndented = true // Optional: Makes the JSON more readable
+                WriteIndented = true
             });
 
             // Log or inspect the JSON (for debugging purposes)
@@ -123,6 +121,5 @@ namespace LocalEyes.Services
                 throw new Exception($"Failed to delete report: {response.ReasonPhrase}");
             }
         }
-
     }
 }

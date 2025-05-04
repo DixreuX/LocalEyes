@@ -20,14 +20,25 @@ namespace LocalEyesAPI.Controllers
         /// <summary>
         /// Get all reports | JWT Auth
         /// </summary>
-        [HttpGet("ReportsExternal")]
+        [HttpGet("Reports")]
         [ServiceFilter<JwtAuthFilter>]
-        public async Task<IActionResult> ReportsExternal()
+        public async Task<IActionResult> Reports()
         {
             var reports = await _context.Reports.ToListAsync();
 
-
             return Ok(reports);
+        }
+
+        /// <summary>
+        /// Get all municipalities | JWT Auth
+        /// </summary>
+        [HttpGet("Municipalities")]
+        [ServiceFilter<JwtAuthFilter>]
+        public async Task<IActionResult> Municipalities()
+        {
+            var municpalities = await _context.Municipalities.ToListAsync();
+
+            return Ok(municpalities);
         }
     }
 }

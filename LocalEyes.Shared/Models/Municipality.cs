@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LocalEyesAPI.Models;
+namespace LocalEyes.Shared.Models;
 
 public partial class Municipality
 {

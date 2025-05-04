@@ -33,6 +33,9 @@ namespace LocalEyesAPI.Controllers
             return Ok(reports);
         }
 
+        /// <summary>
+        /// Get types | Basic Auth
+        /// </summary>
         [HttpGet("Types")]
         [ServiceFilter<BasicAuthFilter>]
         public async Task<IActionResult> GetTypes()
@@ -44,6 +47,9 @@ namespace LocalEyesAPI.Controllers
             return Ok(types);
         }
 
+        /// <summary>
+        /// Create a report | Basic Auth
+        /// </summary>
         [HttpPost("Create")]
         [ServiceFilter<BasicAuthFilter>]
         public async Task<IActionResult> CreateReportAsync([FromBody] Report report)
@@ -65,6 +71,9 @@ namespace LocalEyesAPI.Controllers
             return Ok(report);
         }
 
+        /// <summary>
+        /// Update a report using ID | Basic Auth
+        /// </summary>
         [HttpPut("Update/{id:guid}")]
         [ServiceFilter<BasicAuthFilter>]
         public async Task<IActionResult> UpdateReportAsync(Guid id, [FromBody] Report report)
@@ -87,6 +96,9 @@ namespace LocalEyesAPI.Controllers
             return Ok(existingReport);
         }
 
+        /// <summary>
+        /// Get report by id | Basic Auth
+        /// </summary>
         [HttpGet("{id:guid}")]
         [ServiceFilter<BasicAuthFilter>]
         public async Task<IActionResult> GetReportById(Guid id)
@@ -101,6 +113,9 @@ namespace LocalEyesAPI.Controllers
             return Ok(report);
         }
 
+        /// <summary>
+        /// Delete report using ID | Basic Auth
+        /// </summary>
         [HttpDelete("Delete/{id:guid}")]
         [ServiceFilter<BasicAuthFilter>]
         public async Task<IActionResult> DeleteReportAsync(Guid id)

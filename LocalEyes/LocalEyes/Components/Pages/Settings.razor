@@ -1,0 +1,122 @@
+﻿@page "/settings"
+@rendermode InteractiveServer
+
+@using LocalEyes.Services
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject SettingsService SettingsService
+
+<PageTitle>Settings</PageTitle>
+
+<h1>Settings</h1>
+
+<br />
+
+@if (IsAdmin)
+{
+    <EditForm Model="settingsModel" OnValidSubmit="SaveSettings">
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="col-md-12">
+
+            <div class="col-md-4">
+
+                <div class="form-group mb-3">
+
+                    <label for="baseUrl">API Base URL</label>
+
+                    <InputText id="baseUrl" @bind-Value="settingsModel.BaseURL" class="form-control" />
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="apiKey">API Key</label>
+
+                    <InputText id="apiKey" @bind-Value="settingsModel.Key" class="form-control" />
+
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4">Save</button>
+
+            </div>
+
+
+            <div class="col-md-8">
+            </div>
+
+        </div>
+
+
+    </EditForm>
+}
+else
+{
+    <br />
+
+    <p>You do not have permission to view this page.</p>
+}
+
+@if (showModal)
+{
+    <div class="settings-modal-overlay">
+
+        <div class="settings-modal-box">
+
+            <i class="settings-modal-icon fas fa-check" aria-hidden="true"></i>
+
+            <p>Settings were succesfully saved</p>
+
+        </div>
+    </div>
+}
+
+@code
+{
+    private bool IsAdmin = false;
+    private bool showModal = false;
+    private SettingsModel settingsModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        var user = authState.User;
+
+        IsAdmin = user.Identity?.IsAuthenticated == true && user.IsInRole("Administrator");
+
+
+        if (IsAdmin)
+        {
+            settingsModel.BaseURL = SettingsService.BaseURL;
+            settingsModel.Key = SettingsService.Key;
+        }
+    }
+
+    private async void SaveSettings()
+    {
+        try
+        {
+            SettingsService.UpdateSettings(settingsModel.BaseURL, settingsModel.Key);
+            showModal = true; 
+
+            await Task.Delay(2500); // Close after 3 sek
+            showModal = false;
+
+            StateHasChanged(); // Trigger a ui update
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    private class SettingsModel
+    {
+        public string BaseURL { get; set; } = string.Empty;
+        public string Key { get; set; } = string.Empty;
+    }
+}

@@ -119,16 +119,19 @@ main {
 }
 
 .sidebar {
-    background-color: #262626;
+    background-color: #7d7d7d;
+
+    & .nav-scrollable {
+        border-right: 3px solid #000;
+    }
 }
 
 .top-row {
     background-color: @app-black;
-    border-bottom: 1px solid #d6d5d5;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    height: 3.5rem;
+    height: 75px !important;
 }
 
 .top-row deep a, .top-row deep .btn-link {
@@ -263,6 +266,10 @@ main {
 .navbar-logo {
     height: 40px; 
     width: auto;
+}
+
+.navbar-brand {
+    font-size: 22px !important;
 }
 
 /* Login */
@@ -431,21 +438,29 @@ main {
 /* Maps */
 
 .expanded-row #map {
-    border: 1px solid #ddd;
     border-radius: 5px;
     margin-top: 10px;
 }
 
 /* Tables */
 
-.expanded-row td {
-    padding: 10px;
-    border: 1px solid #ddd; 
+.expanded-row {
+    background-color: #f7f7ff !important;
+    border-top: none;
+
+    & td {
+        padding: 10px;
+        background-color: inherit;
+    }
+
+    & div {
+        background-color: inherit;
+    }
 }
 
-.expanded-row {
-    background-color: #f9f9f9;
-    border-top: none;
+.expanded-parent {
+    background-color: #f7f7ff !important;
+    border-bottom: #f7f7ff !important;
 }
 
 .actions-column {
@@ -473,6 +488,32 @@ th {
 td {
     font-size: 18px;
     vertical-align: middle;
+}
+
+.comments-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+        background-color: #f1f1f1;
+        font-weight: bold;
+        text-align: left;
+        padding: 10px;
+        border-bottom: 2px solid #ddd;
+    }
+
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
 }
 
 /* Forms */
@@ -516,4 +557,32 @@ label {
     display: flex;
     justify-content: center;
     gap: 10px;
+}
+
+.settings-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); // Darken the background
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.settings-modal-box {
+    background-color: @app-white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px;
+}
+
+.settings-modal-icon {
+    font-size: 80px; 
+    height: auto; 
+    width: auto;
 }

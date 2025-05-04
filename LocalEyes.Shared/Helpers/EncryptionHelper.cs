@@ -4,7 +4,6 @@ using System.Text;
 
 namespace LocalEyes.Shared.Helpers
 {
-
     public class EncryptionHelper
     {
         private string _key;

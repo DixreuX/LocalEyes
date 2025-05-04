@@ -1,4 +1,5 @@
 ﻿@page "/Account/Register"
+@layout NoLayout
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text
@@ -6,6 +7,7 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using LocalEyes.Data
+@using LocalEyes.Components.Layout
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore

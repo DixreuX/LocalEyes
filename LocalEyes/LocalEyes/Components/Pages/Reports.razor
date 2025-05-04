@@ -54,7 +54,7 @@ else
         <thead>
 
             <tr>
-                <th>Comment</th>
+                <th>Description</th>
                 <th>Type</th>
                 <th>Created Date</th>
                 <th class="actions-column"></th>
@@ -66,10 +66,12 @@ else
 
             @foreach (var report in reports)
             {
-                <tr>
+                <tr class="@(expandedRows.ContainsKey(report.Id) && expandedRows[report.Id] ? "expanded-parent" : "")">
+
                     <td><strong>@report.Comment</strong></td>
                     <td><strong>@report.Type?.Name</strong></td>
                     <td>@report.CreatedDate.ToShortDateString()</td>
+
                     <td class="actions-column">
 
                         <button class="btn btn-primary table-action-btn ms-1" @onclick="() => ToggleMap(report.Id)">
@@ -88,7 +90,9 @@ else
                         }
 
                     </td>
+
                 </tr>
+
                 @if (expandedRows.ContainsKey(report.Id) && expandedRows[report.Id])
                 {
                     <tr class="expanded-row">
@@ -101,11 +105,58 @@ else
                                 <strong>Longitude:</strong> @report.Longitude
                                 <div id="map-@report.Id" style="height: 400px; width: 100%; margin-top: 10px;"></div>
 
+                                <table class="table comments-table" style="margin-top: 20px;">
+
+                                    <thead>
+
+                                        <tr>
+                                            <th>Comment</th>
+                                            <th>Username</th>
+                                            <th></th>
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                        <tr>
+                                            <td width="60%">Comment</td>
+                                            <td width="20%">Username</td>
+
+                                            <td width="20%" class="actions-column">
+
+                                                <button class="btn btn-primary table-action-btn ms-1" @onclick="() => CreateComment()">
+                                                    <i class="fas fa-comment-medical" aria-hidden="true"></i>
+                                                </button>
+
+                                                @if (IsAdmin)
+                                                {
+                                                    <button class="btn btn-primary table-action-btn ms-1" @onclick="() => EditComment(report.Id)">
+                                                        <i class="fas fa-pencil" aria-hidden="true"></i>
+                                                    </button>
+
+                                                    <button class="btn btn-danger table-action-btn ms-1" @onclick="() => DeleteComment(report.Id)">
+                                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                                    </button>
+                                                }
+
+                                            </td>
+
+                                        </tr>
+
+
+
+                                    </tbody>
+
+                                </table>
+
                             </div>
 
                         </td>
 
                     </tr>
+
+                    
                 }
             }
         </tbody>
@@ -115,14 +166,22 @@ else
 @if (showDeleteConfirmation)
 {
     <div class="modal-overlay">
+
         <div class="modal-box">
+
             <h3>Confirm Deletion</h3>
+
             <p>Are you sure you want to delete this report?</p>
+
             <div class="modal-actions">
+
                 <button class="btn btn-danger" @onclick="ConfirmDelete">Confirm</button>
                 <button class="btn btn-primary" @onclick="CancelDelete">Cancel</button>
+
             </div>
+
         </div>
+
     </div>
 }
 
@@ -219,6 +278,22 @@ else
     private void CancelDelete()
     {
         showDeleteConfirmation = false;
+    }
+
+    private void CreateComment()
+    {
+        Navigation.NavigateTo("/editreport");
+    }
+
+    private void EditComment(Guid reportId)
+    {
+        Navigation.NavigateTo($"/editreport/{reportId}");
+    }
+
+    private void DeleteComment(Guid reportId)
+    {
+        reportToDelete = reportId;
+        showDeleteConfirmation = true;
     }
 }
 

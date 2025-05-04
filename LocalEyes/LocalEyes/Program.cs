@@ -21,12 +21,14 @@ namespace LocalEyes
             builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddHttpClient<ReportService>();
+            builder.Services.AddHttpClient<MunicipalityService>();
 
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();
             builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
             builder.Services.AddScoped<SignInManager<ApplicationUser>>();
             builder.Services.AddScoped<UserManager<ApplicationUser>>();
+            builder.Services.AddSingleton<SettingsService>();
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -98,7 +100,7 @@ namespace LocalEyes
             {
                 await signInManager.SignOutAsync();
 
-                context.Response.Redirect("/");
+                context.Response.Redirect("/reports");
             });
 
             app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
