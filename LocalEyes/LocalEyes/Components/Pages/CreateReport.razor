@@ -1,4 +1,4 @@
-﻿@page "/editreport/{ReportId:guid}"
+﻿@page "/createreport"
 
 @rendermode InteractiveServer
 
@@ -11,7 +11,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
-<h3>Edit Report</h3>
+<h3>Create Report</h3>
 
 <br />
 
@@ -48,13 +48,6 @@
 
             </div>
 
-            <div class="form-fields">
-
-                <label>Priority</label>
-                <InputNumber @bind-Value="report.Priority" class="form-control" />
-
-            </div>
-
             <p style="margin-top: 20px;">Set a marker on the map to automatically get the coordinates or input them manually</p>
 
             <div class="form-fields">
@@ -83,15 +76,15 @@
 
 <script>
 
-    function initializeMap(mapId, reportLatitude, reportLongitude) {
+    function initializeMap(mapId, defaultLatitude, defaultLongitude) {
 
-        const map = L.map(mapId).setView([reportLatitude, reportLongitude], 13);
+        const map = L.map(mapId).setView([defaultLatitude, defaultLongitude], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19
         }).addTo(map);
 
-        let marker = L.marker([reportLatitude, reportLongitude]).addTo(map);
+        let marker = L.marker([defaultLatitude, defaultLongitude]).addTo(map);
 
         map.on('click', function (e) {
 
@@ -111,48 +104,50 @@
 
 @code {
 
-    [Parameter]
-    public Guid ReportId { get; set; }
-
     private Report report = new();
     private List<Shared.Models.Type> types = new();
+    private bool isAdmin = false;
 
-    private double reportLatitude = 0;
-    private double reportLongitude = 0; 
-    private bool isMapInitialized = false;
+    private const double DefaultLatitude = 57.04705499214535; // Aalborg
+    private const double DefaultLongitude = 9.92168426513672; // Aalborg
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        report = await ReportService.GetReportByIdAsync(ReportId);
         types = await ReportService.GetTypesAsync();
 
-        if (double.TryParse(report.Latitude, NumberStyles.Any, CultureInfo.InvariantCulture, out var latitude))
-        {
-            reportLatitude = latitude;
-        }
+        report.Latitude = DefaultLatitude.ToString(CultureInfo.InvariantCulture);
+        report.Longitude = DefaultLongitude.ToString(CultureInfo.InvariantCulture);
+        report.Priority = 3; // Default priority
 
-        if (double.TryParse(report.Longitude, NumberStyles.Any, CultureInfo.InvariantCulture, out var longitude))
-        {
-            reportLongitude = longitude;
-        }
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+
+        isAdmin = user.IsInRole("Administrator");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-        if (firstRender && !isMapInitialized)
+        if (firstRender)
         {
-            isMapInitialized = true;
-
-            await JSRuntime.InvokeVoidAsync("initializeMap", "map", reportLatitude, reportLongitude);
+            await JSRuntime.InvokeVoidAsync("initializeMap", "map", DefaultLatitude, DefaultLongitude);
         }
     }
 
     private async Task SaveReport()
     {
-        report.ModifiedDate = DateTime.UtcNow;
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
 
-        await ReportService.UpdateReport(report);
+
+        report.Id = Guid.NewGuid();
+        report.CreatedDate = DateTime.UtcNow;
+        report.ModifiedDate = DateTime.UtcNow;
+        report.ModifedBy = user.Identity?.Name ?? "";
+
+        await ReportService.CreateReport(report);
 
         Navigation.NavigateTo("/reports");
     }

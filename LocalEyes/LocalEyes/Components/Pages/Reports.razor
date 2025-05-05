@@ -16,13 +16,13 @@
 
     function initializeLeafletMap(mapId, latitude, longitude) {
 
-    const map = L.map(mapId).setView([parseFloat(latitude), parseFloat(longitude)], 13);
+        const map = L.map(mapId).setView([parseFloat(latitude), parseFloat(longitude)], 13);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-    }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+        }).addTo(map);
 
-    L.marker([parseFloat(latitude), parseFloat(longitude)]).addTo(map);
+        L.marker([parseFloat(latitude), parseFloat(longitude)]).addTo(map);
     }
 
 </script>
@@ -133,8 +133,8 @@ else
                                                 {
                                                     <button class="btn btn-primary table-action-btn ms-1" @onclick="() => EditComment(report.Id)">
                                                         <i class="fas fa-pencil" aria-hidden="true"></i>
-                                                    </button>
 
+                                                    </button>
                                                     <button class="btn btn-danger table-action-btn ms-1" @onclick="() => DeleteComment(report.Id)">
                                                         <i class="fas fa-trash" aria-hidden="true"></i>
                                                     </button>
@@ -243,7 +243,7 @@ else
 
     private void CreateReport()
     {
-        Navigation.NavigateTo("/editreport");
+        Navigation.NavigateTo("/createreport");
     }
 
     private void EditReport(Guid reportId)

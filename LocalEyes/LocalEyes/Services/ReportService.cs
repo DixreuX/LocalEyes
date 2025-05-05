@@ -35,8 +35,6 @@ namespace LocalEyes.Services
 
         public async Task<List<Report>> GetReportsAsync()
         {
-            //_httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
-
             var response = await _httpClient.GetAsync("Report/Reports");
 
             if (response.IsSuccessStatusCode)
