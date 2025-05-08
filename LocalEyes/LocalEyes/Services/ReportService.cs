@@ -63,22 +63,32 @@ namespace LocalEyes.Services
             throw new Exception($"Failed to fetch types: {response.ReasonPhrase}");
         }
 
-        public async Task CreateReport(Report report)
+        public async Task CreateReport(Report report, UserReport userReport)
         {
-            var requestJson = JsonSerializer.Serialize(report, new JsonSerializerOptions
+
+            //var requestJson = JsonSerializer.Serialize(report, new JsonSerializerOptions
+            //{
+            //    WriteIndented = true
+            //});
+
+            //var response = await _httpClient.PostAsJsonAsync("Report/Create", report);
+
+            //if (!response.IsSuccessStatusCode)
+            //{
+            //    throw new Exception($"Failed to create report: {response.ReasonPhrase}");
+            //}
+
+            var payload = new
             {
-                WriteIndented = true
-            });
+                Report = report,
+                UserReport = userReport
+            };
 
-            // Log or inspect the JSON (for debugging purposes)
-            Debug.WriteLine("Request JSON:");
-            Debug.WriteLine(requestJson);
-
-            var response = await _httpClient.PostAsJsonAsync("Report/Create", report);
+            var response = await _httpClient.PostAsJsonAsync("Report/Create", payload);
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception($"Failed to create report: {response.ReasonPhrase}");
+                throw new Exception($"Failed to create report with user link: {response.ReasonPhrase}");
             }
         }
 

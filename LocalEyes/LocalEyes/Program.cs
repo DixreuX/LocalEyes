@@ -22,6 +22,7 @@ namespace LocalEyes
 
             builder.Services.AddHttpClient<ReportService>();
             builder.Services.AddHttpClient<MunicipalityService>();
+            builder.Services.AddHttpClient<UserService>();
 
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();

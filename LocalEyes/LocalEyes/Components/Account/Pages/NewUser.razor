@@ -1,0 +1,84 @@
+﻿@page "/Account/NewUser"
+@layout NoLayout
+
+@rendermode InteractiveServer
+
+@using LocalEyes.Services
+@using LocalEyes.Shared.Models
+@using LocalEyes.Components.Layout
+
+@inject UserService UserService
+@inject MunicipalityService MunicipalityService
+@inject NavigationManager Navigation
+
+@attribute [AllowAnonymous]
+
+<PageTitle>New User</PageTitle>
+
+<div class="login-container">
+
+    <h3 class="mb-3">Create New User</h3>
+
+    <EditForm Model="newUser" OnValidSubmit="CreateUser">
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-fields">
+
+            <label>Email</label>
+            <InputText @bind-Value="newUser.Email" class="form-control" />
+            <ValidationMessage For="() => newUser.Email" />
+
+        </div>
+
+        <div class="form-fields">
+
+            <label>Password</label>
+            <InputText @bind-Value="newUser.Password" type="password" class="form-control" />
+            <ValidationMessage For="() => newUser.Password" />
+
+        </div>
+
+        <div class="form-fields">
+
+            <label>Municipality</label>
+
+            <InputSelect @bind-Value="newUser.MunicipalityId" class="form-control">
+
+                <option value="">Select a municipality</option>
+
+                @foreach (var municipality in municipalities)
+                {
+                    <option value="@municipality.Id">@municipality.Name</option>
+                }
+
+            </InputSelect>
+
+            <ValidationMessage For="() => newUser.MunicipalityId" />
+
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4">Create User</button>
+
+    </EditForm>
+
+</div>
+
+@code {
+
+    private LocalEyes.Shared.Models.NewUser newUser = new();
+    private List<Municipality> municipalities = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        municipalities = await MunicipalityService.GetMunicipalitiesAsync();
+    }
+
+    private async Task CreateUser()
+    {
+        await UserService.CreateUserAsync(newUser);
+
+        Navigation.NavigateTo("Account/Login", forceLoad: true);
+    }
+}

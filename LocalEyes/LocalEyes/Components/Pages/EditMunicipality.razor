@@ -23,77 +23,31 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    @* <div class="col-md-12">
+    <div class="col-md-12">
 
-
-
-        <div class=" col-md-6">
+        <div class="col-md-3">
 
             <div class="form-fields">
 
-                <label>Type</label>
-
-                <InputSelect @bind-Value="report.TypeId" class="form-control">
-
-                    <option value="">Select a type</option>
-
-                    @foreach (var type in types)
-                    {
-                        <option value="@type.Id">@type.Name</option>
-                    }
-
-                </InputSelect>
+                <label>Name</label>
+                <InputText @bind-Value="municipality.Name" class="form-control" />
 
             </div>
 
             <div class="form-fields">
 
-                <label>Comment</label>
-                <InputText @bind-Value="report.Comment" class="form-control" />
+                <label>Zipcode</label>
+                <InputText @bind-Value="municipality.Zipcode" class="form-control" />
 
             </div>
 
-            @if (isAdmin)
-            {
-                <div class="form-fields">
+            <button type="submit" class="btn btn-primary mt-3 mb-5">Save</button>
 
-                    <label>Priority</label>
-                    <InputNumber @bind-Value="report.Priority" class="form-control" />
-
-                </div>
-            }
-
-            <p style="margin-top: 20px;">Set a marker on the map to automatically get the coordinates or input them manually</p>
-
-            <div class="form-fields">
-
-                <label>Latitude</label>
-                <InputText @bind-Value="report.Latitude" id="latitudeInput" class="form-control" />
-
-            </div>
-
-            <div class="form-fields">
-
-                <label>Longitude</label>
-                <InputText @bind-Value="report.Longitude" id="longitudeInput" class="form-control" />
-
-            </div>
-
-            <div id="map" style="height: 340px; width: 100%; margin: 30px 0 10px 0;"></div>
-
-
-        </div>
-
-        <div class=" col-md-6">
         </div>
 
     </div>
 
-
-    <button type="submit" class="btn btn-primary mt-3 mb-5">Save</button>
- *@
 </EditForm>
-
 
 @code {
 
@@ -102,55 +56,25 @@
 
     private Municipality municipality = new();
     private bool IsNewMunicipality => !MunicipalityId.HasValue;
-    private bool isAdmin = false;
-
-    [CascadingParameter]
-    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-
         if (!IsNewMunicipality)
         {
-            // report = await ReportService.GetReportByIdAsync(ReportId.Value);
+            municipality = await MunicipalityService.GetMunicipalityByIdAsync(MunicipalityId.Value);
         }
-        else
-        {
-            // report.Latitude = DefaultLatitude.ToString();
-            // report.Longitude = DefaultLongitude.ToString();
-            // report.Priority = 3; // Default value
-        }
-
-        var authState = await AuthenticationStateTask;
-        var user = authState.User;
-
-        // foreach (var claim in user.Claims)
-        // {
-        //     Debug.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-        // }
-
-        isAdmin = user.IsInRole("Administrator");
     }
 
     private async Task SaveMunicipality()
     {
-
-        var authState = await AuthenticationStateTask;
-        var user = authState.User;
-
-        // report.Id = Guid.NewGuid();
-        // report.CreatedDate = DateTime.UtcNow;
-        // report.ModifiedDate = DateTime.UtcNow;
-        // report.ModifedBy = user.Identity?.Name ?? "";
-
-        // if (IsNewReport)
-        // {
-        //     await ReportService.CreateReport(report);
-        // }
-        // else
-        // {
-        //     await ReportService.UpdateReport(report);
-        // }
+        if (IsNewMunicipality)
+        {
+            await MunicipalityService.CreateMunicipality(municipality);
+        }
+        else
+        {
+            await MunicipalityService.UpdateMunicipality(municipality);
+        }
 
         Navigation.NavigateTo("/municipalities");
     }

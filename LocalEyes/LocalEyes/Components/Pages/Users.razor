@@ -1,10 +1,156 @@
 ﻿@page "/users"
+
+@using LocalEyes.Data
+@inject LocalEyes.Services.UserService UserService
+@inject NavigationManager Navigation
+
 @rendermode InteractiveServer
 
 <PageTitle>Users</PageTitle>
 
 <h1>Users</h1>
+<br />
+<br />
+
+<row>
+
+    <div class="col-md-12" style="text-align: end">
+
+        <button class="btn btn-primary" @onclick="() => CreateAPIUser()">New API User</button>
+
+    </div>
+
+</row>
+
+@if (users == null)
+{
+    <p>Loading...</p>
+}
+else if (users.Count == 0)
+{
+    <p>No users available.</p>
+}
+else
+{
+    <table class="table">
+
+        <thead>
+
+            <tr>
+
+                <th>Username</th>
+                <th>Email</th>
+                <th class="actions-column"></th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var user in users)
+            {
+                <tr>
+
+                    <td><strong>@user.UserName</strong></td>
+                    <td><strong>@user.Email</strong></td>
+
+                    <td class="actions-column">
+
+                        <button class="btn btn-primary table-action-btn ms-1" @onclick="() => EditUser(user.Id)">
+                            <i class="fas fa-pencil" aria-hidden="true"></i>
+                        </button>
+
+                        <button class="btn btn-danger table-action-btn ms-1" @onclick="() => DeleteUser(user.Id)">
+                            <i class="fas fa-trash" aria-hidden="true"></i>
+                        </button>
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+}
+
+@if (showDeleteConfirmation)
+{
+    <div class="modal-overlay">
+
+        <div class="modal-box">
+
+            <h3>Confirm Deletion</h3>
+
+            <p>Are you sure you want to delete this user?</p>
+
+            <div class="modal-actions">
+
+                <button class="btn btn-danger" @onclick="ConfirmDelete">Confirm</button>
+                <button class="btn btn-primary" @onclick="CancelDelete">Cancel</button>
+
+            </div>
+
+        </div>
+
+    </div>
+}
 
 @code {
-    
+
+    private List<ApplicationUser> users;
+    private bool showDeleteConfirmation = false;
+    private Guid userToDelete;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            users = await UserService.GetUsersAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching users: {ex.Message}");
+        }
+    }
+
+    private void CreateAPIUser()
+    {
+        Navigation.NavigateTo("/NewAPIUser");
+    }
+
+    private void EditUser(Guid userId)
+    {
+        Navigation.NavigateTo($"/edituser/{userId}");
+    }
+
+    private void DeleteUser(Guid userId)
+    {
+        userToDelete = userId;
+        showDeleteConfirmation = true;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        try
+        {
+            await UserService.DeleteUserAsync(userToDelete);
+
+            users = users.Where(u => u.Id != userToDelete).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting user: {ex.Message}");
+        }
+        finally
+        {
+            showDeleteConfirmation = false;
+        }
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteConfirmation = false;
+    }
 }

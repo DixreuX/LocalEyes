@@ -33,6 +33,7 @@ namespace LocalEyes.Services
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
+
                 return JsonSerializer.Deserialize<List<Municipality>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
 
@@ -47,6 +48,20 @@ namespace LocalEyes.Services
             {
                 throw new Exception($"Failed to create municipality: {response.ReasonPhrase}");
             }
+        }
+
+        public async Task<Municipality> GetMunicipalityByIdAsync(Guid municipalityId)
+        {
+            var response = await _httpClient.GetAsync($"Municipality/{municipalityId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+
+                return JsonSerializer.Deserialize<Municipality>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+
+            throw new Exception($"Failed to fetch municipality: {response.ReasonPhrase}");
         }
 
         public async Task UpdateMunicipality(Municipality municipality)

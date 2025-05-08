@@ -1,9 +1,8 @@
 ﻿using LocalEyes.Shared.Models;
-using LocalEyesAPI.Data;
 using System;
 using System.Collections.Generic;
 
-namespace LocalEyesAPI.Models;
+namespace LocalEyes.Shared.Models;
 
 public partial class MunicipalityUser
 {
@@ -14,6 +13,4 @@ public partial class MunicipalityUser
     public Guid UserId { get; set; }
 
     public virtual Municipality Municipality { get; set; } = null!;
-
-    public virtual ApplicationUser User { get; set; } = null!;
 }

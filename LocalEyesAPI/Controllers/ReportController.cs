@@ -4,6 +4,8 @@ using LocalEyes.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using Azure.Core;
+using LocalEyes.Shared.DTO;
 
 namespace LocalEyesAPI.Controllers
 {
@@ -52,23 +54,37 @@ namespace LocalEyesAPI.Controllers
         /// </summary>
         [HttpPost("Create")]
         [ServiceFilter<BasicAuthFilter>]
-        public async Task<IActionResult> CreateReportAsync([FromBody] Report report)
+        public async Task<IActionResult> CreateReportAsync([FromBody] ReportWithUserId request)
         {
-            if (report == null)
+            //if (report == null)
+            //{
+            //    return BadRequest("Report cannot be null.");
+            //}
+
+            //if (report.Type == null)
+            //{
+            //    Debug.WriteLine("Type is null. Proceeding without it.");
+            //}
+
+            //_context.Reports.Add(report);
+
+            //await _context.SaveChangesAsync();
+
+            //return Ok(report);
+
+            if (request.Report == null || request.UserReport == null)
             {
-                return BadRequest("Report cannot be null.");
+                return BadRequest("Report or UserReport cannot be null.");
             }
 
-            if (report.Type == null)
-            {
-                Debug.WriteLine("Type is null. Proceeding without it.");
-            }
+            _context.Reports.Add(request.Report);
+            _context.UserReports.Add(request.UserReport);
 
-            _context.Reports.Add(report);
+            string stop = "";
 
             await _context.SaveChangesAsync();
 
-            return Ok(report);
+            return Ok(request.Report);
         }
 
         /// <summary>

@@ -1,9 +1,8 @@
-﻿using LocalEyesAPI.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using LocalEyes.Shared.Models;
 
-namespace LocalEyesAPI.Models;
+namespace LocalEyes.Shared.Models;
 
 public partial class ReportComment
 {

@@ -1,9 +1,8 @@
-﻿using LocalEyesAPI.Models;
-using LocalEyes.Shared.Models;
+﻿using LocalEyes.Shared.Models;
 using System;
 using System.Collections.Generic;
 
-namespace LocalEyesAPI.Models;
+namespace LocalEyes.Shared.Models;
 
 public partial class MunicipalityReport
 {

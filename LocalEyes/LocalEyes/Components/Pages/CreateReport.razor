@@ -78,27 +78,27 @@
 
     function initializeMap(mapId, defaultLatitude, defaultLongitude) {
 
-        const map = L.map(mapId).setView([defaultLatitude, defaultLongitude], 13);
+    const map = L.map(mapId).setView([defaultLatitude, defaultLongitude], 13);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19
-        }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+    }).addTo(map);
 
-        let marker = L.marker([defaultLatitude, defaultLongitude]).addTo(map);
+    let marker = L.marker([defaultLatitude, defaultLongitude]).addTo(map);
 
-        map.on('click', function (e) {
+    map.on('click', function (e) {
 
-            const { lat, lng } = e.latlng;
+    const { lat, lng } = e.latlng;
 
-            if (marker) {
-                marker.setLatLng(e.latlng);
-            } else {
-                marker = L.marker(e.latlng).addTo(map);
-            }
+    if (marker) {
+    marker.setLatLng(e.latlng);
+    } else {
+    marker = L.marker(e.latlng).addTo(map);
+    }
 
-            document.getElementById('latitudeInput').value = lat;
-            document.getElementById('longitudeInput').value = lng;
-        });
+    document.getElementById('latitudeInput').value = lat;
+    document.getElementById('longitudeInput').value = lng;
+    });
     }
 </script>
 
@@ -141,13 +141,28 @@
         var authState = await AuthenticationStateTask;
         var user = authState.User;
 
+        var userIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            throw new InvalidOperationException("Unable to retrieve the logged-in user's ID.");
+        }
 
         report.Id = Guid.NewGuid();
         report.CreatedDate = DateTime.UtcNow;
         report.ModifiedDate = DateTime.UtcNow;
         report.ModifedBy = user.Identity?.Name ?? "";
 
-        await ReportService.CreateReport(report);
+        var userReport = new UserReport
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            ReportId = report.Id
+        };
+
+        string stop = "";
+
+        await ReportService.CreateReport(report, userReport);
 
         Navigation.NavigateTo("/reports");
     }
