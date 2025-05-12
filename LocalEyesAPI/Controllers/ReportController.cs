@@ -56,21 +56,6 @@ namespace LocalEyesAPI.Controllers
         [ServiceFilter<BasicAuthFilter>]
         public async Task<IActionResult> CreateReportAsync([FromBody] ReportWithUserId request)
         {
-            //if (report == null)
-            //{
-            //    return BadRequest("Report cannot be null.");
-            //}
-
-            //if (report.Type == null)
-            //{
-            //    Debug.WriteLine("Type is null. Proceeding without it.");
-            //}
-
-            //_context.Reports.Add(report);
-
-            //await _context.SaveChangesAsync();
-
-            //return Ok(report);
 
             if (request.Report == null || request.UserReport == null)
             {
@@ -79,8 +64,6 @@ namespace LocalEyesAPI.Controllers
 
             _context.Reports.Add(request.Report);
             _context.UserReports.Add(request.UserReport);
-
-            string stop = "";
 
             await _context.SaveChangesAsync();
 
@@ -144,9 +127,60 @@ namespace LocalEyesAPI.Controllers
             }
 
             _context.Reports.Remove(report);
+
             await _context.SaveChangesAsync();
 
             return Ok($"Report with ID {id} has been deleted.");
+        }
+
+        /// <summary>
+        /// Retrieve comments for a report | Basic Auth
+        /// </summary>
+        [HttpGet("{reportId:guid}/comments")]
+        [ServiceFilter<BasicAuthFilter>]
+        public async Task<IActionResult> GetCommentsForReport(Guid reportId)
+        {
+            var comments = await _context.ReportComments
+                .Where(rc => rc.ReportId == reportId)
+                .Include(rc => rc.Comment)
+                .Select(rc => new
+                {
+                    rc.Comment.Id,
+                    rc.Comment.Username,
+                    rc.Comment.UserComment
+                })
+                .ToListAsync();
+
+            return Ok(comments);
+        }
+
+        /// <summary>
+        /// Add a comment to a report | Basic Auth
+        /// </summary>
+        [HttpPost("{reportId:guid}/comments")]
+        [ServiceFilter<BasicAuthFilter>]
+        public async Task<IActionResult> AddCommentToReport(Guid reportId, [FromBody] Comment comment)
+        {
+            if (string.IsNullOrWhiteSpace(comment.UserComment) || string.IsNullOrWhiteSpace(comment.Username))
+            {
+                return BadRequest("Comment and Username are required.");
+            }
+
+            comment.Id = Guid.NewGuid();
+
+            _context.Comments.Add(comment);
+
+            var reportComment = new ReportComment
+            {
+                Id = Guid.NewGuid(),
+                ReportId = reportId,
+                CommentId = comment.Id
+            };
+            _context.ReportComments.Add(reportComment);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(comment);
         }
     }
 }

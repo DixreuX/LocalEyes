@@ -9,5 +9,5 @@ public partial class Comment
 
     public string Username { get; set; } = null!;
 
-    public string Comment1 { get; set; } = null!;
+    public string UserComment { get; set; } = null!;
 }

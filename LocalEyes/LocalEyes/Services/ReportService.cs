@@ -49,7 +49,6 @@ namespace LocalEyes.Services
 
         public async Task<List<Shared.Models.Type>> GetTypesAsync()
         {
-            //_httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
 
             var response = await _httpClient.GetAsync("Report/Types");
 
@@ -65,18 +64,6 @@ namespace LocalEyes.Services
 
         public async Task CreateReport(Report report, UserReport userReport)
         {
-
-            //var requestJson = JsonSerializer.Serialize(report, new JsonSerializerOptions
-            //{
-            //    WriteIndented = true
-            //});
-
-            //var response = await _httpClient.PostAsJsonAsync("Report/Create", report);
-
-            //if (!response.IsSuccessStatusCode)
-            //{
-            //    throw new Exception($"Failed to create report: {response.ReasonPhrase}");
-            //}
 
             var payload = new
             {
@@ -94,7 +81,6 @@ namespace LocalEyes.Services
 
         public async Task UpdateReport(Report report)
         {
-            //_httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
 
             var response = await _httpClient.PutAsJsonAsync($"Report/Update/{report.Id}", report);
 
@@ -106,7 +92,6 @@ namespace LocalEyes.Services
 
         public async Task<Report> GetReportByIdAsync(Guid reportId)
         {
-            //_httpClient.DefaultRequestHeaders.Add("APIKey", _apiKeyEncrypted);
 
             var response = await _httpClient.GetAsync($"Report/{reportId}");
 
@@ -127,6 +112,32 @@ namespace LocalEyes.Services
             if (!response.IsSuccessStatusCode)
             {
                 throw new Exception($"Failed to delete report: {response.ReasonPhrase}");
+            }
+        }
+
+        public async Task<List<Comment>> GetCommentsForReportAsync(Guid reportId)
+        {
+            var response = await _httpClient.GetAsync($"Report/{reportId}/comments");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+
+                return JsonSerializer.Deserialize<List<Comment>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            else
+            {
+                throw new Exception($"Failed to fetch comments: {response.ReasonPhrase}");
+            }
+        }
+
+        public async Task AddCommentToReportAsync(Guid reportId, Comment comment)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"Report/{reportId}/comments", comment);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Failed to add comment: {response.ReasonPhrase}");
             }
         }
     }
